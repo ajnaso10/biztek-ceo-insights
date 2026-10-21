@@ -1,0 +1,146 @@
+/**
+ * Biztek workspace top bar on Insights SPA.
+ * Self-contained bar styles + Insights layout offset (does not rely on desk CSS).
+ */
+:root {
+	--biztek-topbar-height: 48px;
+	--biztek-topbar-bg: #093587;
+	--biztek-topbar-border: #072a6b;
+	--biztek-inactive-grey: #b8c4c8;
+	/* Match Desk --font-stack (frappe espresso typography) */
+	--font-stack: "InterVariable", "Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI",
+		"Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+}
+
+body.biztek-ceo-insights-has-topbar,
+body.biztek-has-workspace-topbar.biztek-ceo-insights-has-topbar {
+	padding-top: var(--biztek-topbar-height) !important;
+	box-sizing: border-box;
+}
+
+body.biztek-ceo-insights-has-topbar #app {
+	min-height: calc(100vh - var(--biztek-topbar-height));
+	max-height: calc(100vh - var(--biztek-topbar-height));
+	overflow: auto;
+	box-sizing: border-box;
+}
+
+.biztek-workspace-topbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1030;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	height: var(--biztek-topbar-height);
+	padding: 0 16px;
+	background: var(--biztek-topbar-bg);
+	border-bottom: 1px solid var(--biztek-topbar-border);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+	font-family: var(--font-stack);
+}
+
+.biztek-workspace-topbar__brand {
+	flex: 0 0 120px;
+	width: 120px;
+	min-width: 120px;
+	display: flex;
+	align-items: center;
+	height: 28px;
+	max-height: calc(var(--biztek-topbar-height) - 20px);
+	padding: 0;
+	border: 0;
+	text-decoration: none;
+	overflow: hidden;
+	font-size: 0;
+	line-height: 0;
+	color: transparent;
+}
+
+.biztek-workspace-topbar__brand img {
+	display: block;
+	height: 28px;
+	max-height: calc(var(--biztek-topbar-height) - 20px);
+	width: auto;
+	max-width: 100%;
+	object-fit: contain;
+	object-position: left center;
+}
+
+.biztek-workspace-topbar__nav-wrap {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.biztek-workspace-topbar__nav {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 4px;
+	flex: 1 1 auto;
+	width: 100%;
+	min-width: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+}
+
+.biztek-workspace-topbar__nav::-webkit-scrollbar {
+	height: 0;
+}
+
+.biztek-workspace-topbar:hover .biztek-workspace-topbar__nav {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.45) rgba(255, 255, 255, 0.12);
+}
+
+.biztek-workspace-topbar:hover .biztek-workspace-topbar__nav::-webkit-scrollbar {
+	height: 6px;
+}
+
+.biztek-workspace-topbar:hover .biztek-workspace-topbar__nav::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.12);
+	border-radius: 4px;
+}
+
+.biztek-workspace-topbar:hover .biztek-workspace-topbar__nav::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.45);
+	border-radius: 4px;
+}
+
+.biztek-workspace-link {
+	flex: 0 0 auto;
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--biztek-inactive-grey);
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.biztek-workspace-link:hover {
+	background: rgba(255, 255, 255, 0.12);
+	color: rgba(255, 255, 255, 0.9);
+	text-decoration: none;
+}
+
+.biztek-workspace-link.active {
+	background: #ffffff;
+	color: var(--biztek-topbar-bg);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+	font-weight: 700;
+}
+
+.biztek-workspace-link.active:hover {
+	background: #ffffff;
+	color: var(--biztek-topbar-bg);
+	text-decoration: none;
+}

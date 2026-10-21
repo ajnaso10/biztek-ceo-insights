@@ -8,7 +8,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        files: "biztek_insights.*"
+        files: "biztek_ceo_insights.*"
         exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
       - id: check-merge-conflict
       - id: check-ast
@@ -38,11 +38,11 @@ repos:
         # Ignore any files that might contain jinja / bundles
         exclude: |
             (?x)^(
-                biztek_insights/public/dist/.*|
+                biztek_ceo_insights/public/dist/.*|
                 .*node_modules.*|
                 .*boilerplate.*|
-                biztek_insights/templates/includes/.*|
-                biztek_insights/public/js/lib/.*
+                biztek_ceo_insights/templates/includes/.*|
+                biztek_ceo_insights/public/js/lib/.*
             )$
 
 
@@ -55,12 +55,12 @@ repos:
         # Ignore any files that might contain jinja / bundles
         exclude: |
             (?x)^(
-                biztek_insights/public/dist/.*|
+                biztek_ceo_insights/public/dist/.*|
                 cypress/.*|
                 .*node_modules.*|
                 .*boilerplate.*|
-                biztek_insights/templates/includes/.*|
-                biztek_insights/public/js/lib/.*
+                biztek_ceo_insights/templates/includes/.*|
+                biztek_ceo_insights/public/js/lib/.*
             )$
 
 ci:
