@@ -1,0 +1,974 @@
+{
+	"version": "1.0",
+	"type": "Workbook",
+	"name": "template-crm-pipeline",
+	"doc": {
+		"name": "template-crm-pipeline",
+		"title": "CRM Pipeline"
+	},
+	"dependencies": {
+		"folders": [],
+		"queries": {
+			"tq-leads": {
+				"name": "tq-leads",
+				"title": "Leads",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 0,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabLead"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "disabled"
+								},
+								"operator": "=",
+								"value": 0
+							}
+						]
+					},
+					{
+						"type": "mutate",
+						"new_name": "source",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else((utm_source.isnull()) | (utm_source == ''), ibis.literal('Unknown'), utm_source)"
+						}
+					}
+				]
+			},
+			"tq-opportunities": {
+				"name": "tq-opportunities",
+				"title": "Opportunities",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 1,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabOpportunity"
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					}
+				]
+			},
+			"tq-quotations": {
+				"name": "tq-quotations",
+				"title": "Quotations",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 2,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabQuotation"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							}
+						]
+					}
+				]
+			},
+			"tq-funnel-opportunities": {
+				"name": "tq-funnel-opportunities",
+				"title": "Funnel Opportunities (helper)",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 3,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabOpportunity"
+						}
+					},
+					{
+						"type": "summarize",
+						"measures": [
+							{
+								"measure_name": "records",
+								"column_name": "count",
+								"data_type": "Integer",
+								"aggregation": "count"
+							}
+						],
+						"dimensions": []
+					},
+					{
+						"type": "mutate",
+						"new_name": "stage",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "ibis.literal('2. Opportunities')"
+						}
+					}
+				]
+			},
+			"tq-funnel-quotations": {
+				"name": "tq-funnel-quotations",
+				"title": "Funnel Quotations (helper)",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 4,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabQuotation"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							}
+						]
+					},
+					{
+						"type": "summarize",
+						"measures": [
+							{
+								"measure_name": "records",
+								"column_name": "count",
+								"data_type": "Integer",
+								"aggregation": "count"
+							}
+						],
+						"dimensions": []
+					},
+					{
+						"type": "mutate",
+						"new_name": "stage",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "ibis.literal('3. Quotations')"
+						}
+					}
+				]
+			},
+			"tq-crm-funnel": {
+				"name": "tq-crm-funnel",
+				"title": "CRM Funnel",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 5,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabLead"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "disabled"
+								},
+								"operator": "=",
+								"value": 0
+							}
+						]
+					},
+					{
+						"type": "summarize",
+						"measures": [
+							{
+								"measure_name": "records",
+								"column_name": "count",
+								"data_type": "Integer",
+								"aggregation": "count"
+							}
+						],
+						"dimensions": []
+					},
+					{
+						"type": "mutate",
+						"new_name": "stage",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "ibis.literal('1. Leads')"
+						}
+					},
+					{
+						"type": "union",
+						"table": {
+							"type": "query",
+							"workbook": "template-crm-pipeline",
+							"query_name": "tq-funnel-opportunities"
+						},
+						"distinct": false
+					},
+					{
+						"type": "union",
+						"table": {
+							"type": "query",
+							"workbook": "template-crm-pipeline",
+							"query_name": "tq-funnel-quotations"
+						},
+						"distinct": false
+					}
+				]
+			}
+		},
+		"charts": {
+			"tc-open-leads": {
+				"name": "tc-open-leads",
+				"title": "Open Leads",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 0,
+				"query": "tq-leads",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Open Leads",
+							"column_name": "name",
+							"data_type": "Integer",
+							"aggregation": "count"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false,
+							"comparison": {
+								"source": "previous"
+							}
+						}
+					],
+					"sparkline": true,
+					"date_column": {
+						"dimension_name": "creation",
+						"column_name": "creation",
+						"data_type": "Datetime"
+					},
+					"window": {
+						"grain": "month"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "not_in",
+								"value": [
+									"Converted",
+									"Do Not Contact"
+								]
+							}
+						]
+					}
+				}
+			},
+			"tc-pipeline-kpis": {
+				"name": "tc-pipeline-kpis",
+				"title": "Pipeline Summary",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 1,
+				"query": "tq-opportunities",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Open Opportunities",
+							"column_name": "name",
+							"data_type": "Integer",
+							"aggregation": "count"
+						},
+						{
+							"measure_name": "Pipeline Value",
+							"column_name": "base_opportunity_amount",
+							"data_type": "Decimal",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false,
+							"comparison": {
+								"source": "previous"
+							}
+						},
+						{
+							"decimal": 2,
+							"shorten_numbers": true,
+							"comparison": {
+								"source": "previous"
+							}
+						}
+					],
+					"sparkline": true,
+					"date_column": {
+						"dimension_name": "transaction_date",
+						"column_name": "transaction_date",
+						"data_type": "Date"
+					},
+					"window": {
+						"grain": "month"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-open-quotations": {
+				"name": "tc-open-quotations",
+				"title": "Open Quotations",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 2,
+				"query": "tq-quotations",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Open Quotations",
+							"column_name": "name",
+							"data_type": "Integer",
+							"aggregation": "count"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false,
+							"comparison": {
+								"source": "previous"
+							}
+						}
+					],
+					"sparkline": true,
+					"date_column": {
+						"dimension_name": "transaction_date",
+						"column_name": "transaction_date",
+						"data_type": "Date"
+					},
+					"window": {
+						"grain": "month"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-lead-trend": {
+				"name": "tc-lead-trend",
+				"title": "Leads, per Month",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 3,
+				"query": "tq-leads",
+				"chart_type": "Line",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "creation",
+							"column_name": "creation",
+							"data_type": "Datetime",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Leads",
+									"column_name": "name",
+									"data_type": "Integer",
+									"aggregation": "count"
+								}
+							}
+						],
+						"smooth": true,
+						"show_area": true
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "creation"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-leads-by-status": {
+				"name": "tc-leads-by-status",
+				"title": "Leads by Status",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 4,
+				"query": "tq-leads",
+				"chart_type": "Donut",
+				"config": {
+					"label_column": {
+						"dimension_name": "status",
+						"column_name": "status",
+						"data_type": "String"
+					},
+					"value_column": {
+						"measure_name": "Leads",
+						"column_name": "name",
+						"data_type": "Integer",
+						"aggregation": "count"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-leads-by-source": {
+				"name": "tc-leads-by-source",
+				"title": "Leads by Source",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 5,
+				"query": "tq-leads",
+				"chart_type": "Donut",
+				"config": {
+					"label_column": {
+						"dimension_name": "source",
+						"column_name": "source",
+						"data_type": "String"
+					},
+					"value_column": {
+						"measure_name": "Leads",
+						"column_name": "name",
+						"data_type": "Integer",
+						"aggregation": "count"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-opps-by-stage": {
+				"name": "tc-opps-by-stage",
+				"title": "Pipeline Value by Sales Stage",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 6,
+				"query": "tq-opportunities",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "sales_stage",
+							"column_name": "sales_stage",
+							"data_type": "String"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Pipeline Value",
+									"column_name": "base_opportunity_amount",
+									"data_type": "Decimal",
+									"aggregation": "sum",
+									"format": "currency",
+									"currency_column": "default_currency"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Pipeline Value"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 20,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "not_in",
+								"value": [
+									"Lost",
+									"Closed"
+								]
+							}
+						]
+					}
+				}
+			},
+			"tc-crm-funnel": {
+				"name": "tc-crm-funnel",
+				"title": "Lead to Quotation Funnel",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 7,
+				"query": "tq-crm-funnel",
+				"chart_type": "Funnel",
+				"config": {
+					"label_column": {
+						"dimension_name": "stage",
+						"column_name": "stage",
+						"data_type": "String"
+					},
+					"value_column": {
+						"measure_name": "Records",
+						"column_name": "records",
+						"data_type": "Decimal",
+						"aggregation": "sum"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-top-lead-owners": {
+				"name": "tc-top-lead-owners",
+				"title": "Top Lead Owners",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 8,
+				"query": "tq-leads",
+				"chart_type": "Row",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "lead_owner",
+							"column_name": "lead_owner",
+							"data_type": "String"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Leads",
+									"column_name": "name",
+									"data_type": "Integer",
+									"aggregation": "count"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Leads"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 10,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "lead_owner"
+								},
+								"operator": "is_set"
+							}
+						]
+					}
+				}
+			},
+			"tc-open-opportunities": {
+				"name": "tc-open-opportunities",
+				"title": "Open Opportunities",
+				"workbook": "template-crm-pipeline",
+				"folder": null,
+				"sort_order": 9,
+				"query": "tq-opportunities",
+				"chart_type": "Table",
+				"config": {
+					"rows": [
+						{
+							"dimension_name": "Customer",
+							"column_name": "customer_name",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "Sales Stage",
+							"column_name": "sales_stage",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "Owner",
+							"column_name": "opportunity_owner",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "Expected Closing",
+							"column_name": "expected_closing",
+							"data_type": "Date"
+						}
+					],
+					"columns": [],
+					"values": [
+						{
+							"measure_name": "Amount",
+							"column_name": "base_opportunity_amount",
+							"data_type": "Decimal",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Amount"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 20,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			}
+		},
+		"dashboards": {
+			"td-crm-pipeline": {
+				"name": "td-crm-pipeline",
+				"title": "CRM Pipeline",
+				"workbook": "template-crm-pipeline",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"icon": "calendar",
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"links": {
+							"tc-open-leads": "`tq-leads`.`creation`",
+							"tc-pipeline-kpis": "`tq-opportunities`.`transaction_date`",
+							"tc-open-quotations": "`tq-quotations`.`transaction_date`",
+							"tc-lead-trend": "`tq-leads`.`creation`",
+							"tc-leads-by-status": "`tq-leads`.`creation`",
+							"tc-leads-by-source": "`tq-leads`.`creation`",
+							"tc-opps-by-stage": "`tq-opportunities`.`transaction_date`",
+							"tc-top-lead-owners": "`tq-leads`.`creation`",
+							"tc-open-opportunities": "`tq-opportunities`.`transaction_date`"
+						},
+						"layout": {
+							"i": "filter-date",
+							"x": 0,
+							"y": 0,
+							"w": 4,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"icon": "building-2",
+						"links": {
+							"tc-open-leads": "`tq-leads`.`company`",
+							"tc-pipeline-kpis": "`tq-opportunities`.`company`",
+							"tc-open-quotations": "`tq-quotations`.`company`",
+							"tc-lead-trend": "`tq-leads`.`company`",
+							"tc-leads-by-status": "`tq-leads`.`company`",
+							"tc-leads-by-source": "`tq-leads`.`company`",
+							"tc-opps-by-stage": "`tq-opportunities`.`company`",
+							"tc-top-lead-owners": "`tq-leads`.`company`",
+							"tc-open-opportunities": "`tq-opportunities`.`company`"
+						},
+						"layout": {
+							"i": "filter-company",
+							"x": 4,
+							"y": 0,
+							"w": 4,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-open-leads",
+						"layout": {
+							"i": "kpi-leads",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 7
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-kpis",
+						"layout": {
+							"i": "kpi-opps",
+							"x": 5,
+							"y": 2,
+							"w": 5,
+							"h": 7
+						},
+						"reading": "Open Opportunities"
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-kpis",
+						"layout": {
+							"i": "kpi-value",
+							"x": 10,
+							"y": 2,
+							"w": 5,
+							"h": 7
+						},
+						"reading": "Pipeline Value"
+					},
+					{
+						"type": "chart",
+						"chart": "tc-open-quotations",
+						"layout": {
+							"i": "kpi-quotes",
+							"x": 15,
+							"y": 2,
+							"w": 5,
+							"h": 7
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-lead-trend",
+						"layout": {
+							"i": "lead-trend",
+							"x": 0,
+							"y": 9,
+							"w": 12,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-leads-by-status",
+						"layout": {
+							"i": "leads-status",
+							"x": 12,
+							"y": 9,
+							"w": 8,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-leads-by-source",
+						"layout": {
+							"i": "leads-source",
+							"x": 0,
+							"y": 32,
+							"w": 10,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-opps-by-stage",
+						"layout": {
+							"i": "opps-stage",
+							"x": 10,
+							"y": 32,
+							"w": 10,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-crm-funnel",
+						"layout": {
+							"i": "funnel",
+							"x": 0,
+							"y": 55,
+							"w": 12,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-top-lead-owners",
+						"layout": {
+							"i": "owners",
+							"x": 12,
+							"y": 55,
+							"w": 8,
+							"h": 23
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-open-opportunities",
+						"layout": {
+							"i": "open-opps",
+							"x": 0,
+							"y": 78,
+							"w": 20,
+							"h": 23
+						}
+					}
+				]
+			}
+		}
+	}
+}

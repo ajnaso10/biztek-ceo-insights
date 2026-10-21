@@ -1,0 +1,4225 @@
+{
+	"version": "1.0",
+	"type": "Workbook",
+	"name": "template-ceo-command-center",
+	"doc": {
+		"name": "template-ceo-command-center",
+		"title": "CEO Command Center"
+	},
+	"dependencies": {
+		"folders": [],
+		"queries": {
+			"tq-gl-pl": {
+				"name": "tq-gl-pl",
+				"title": "P/L GL Entries",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 0,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabGL Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "is_cancelled"
+								},
+								"operator": "=",
+								"value": 0
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "voucher_type"
+								},
+								"operator": "!=",
+								"value": "Period Closing Voucher"
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "inner",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabAccount"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "account_name"
+							},
+							{
+								"type": "column",
+								"column_name": "root_type"
+							},
+							{
+								"type": "column",
+								"column_name": "account_type"
+							},
+							{
+								"type": "column",
+								"column_name": "report_type"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "account"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "report_type"
+								},
+								"operator": "=",
+								"value": "Profit and Loss"
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "sales_amount",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(root_type == 'Income', credit - debit, 0)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "direct_cost",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(is_in(account_type, 'Cost of Goods Sold', 'Direct Expense'), debit - credit, 0)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "operating_cost",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else((root_type == 'Expense') & is_not_in(account_type, 'Cost of Goods Sold', 'Direct Expense'), debit - credit, 0)"
+						}
+					}
+				]
+			},
+			"tq-sales-invoices": {
+				"name": "tq-sales-invoices",
+				"title": "Sales Invoices",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 1,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabSales Invoice"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					}
+				]
+			},
+			"tq-ar": {
+				"name": "tq-ar",
+				"title": "AR Open Invoices",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 2,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabPayment Ledger Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "delinked"
+								},
+								"operator": "=",
+								"value": 0
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "party_type"
+								},
+								"operator": "=",
+								"value": "Customer"
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "against_voucher_type"
+								},
+								"operator": "=",
+								"value": "Sales Invoice"
+							}
+						]
+					},
+					{
+						"type": "summarize",
+						"measures": [
+							{
+								"measure_name": "outstanding",
+								"expression": {
+									"type": "expression",
+									"expression": "sum(amount)"
+								},
+								"data_type": "Decimal"
+							}
+						],
+						"dimensions": [
+							{
+								"dimension_name": "against_voucher",
+								"column_name": "against_voucher_no",
+								"data_type": "String"
+							}
+						]
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "outstanding"
+								},
+								"operator": ">",
+								"value": 0.5
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "inner",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabSales Invoice"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "company"
+							},
+							{
+								"type": "column",
+								"column_name": "customer"
+							},
+							{
+								"type": "column",
+								"column_name": "customer_name"
+							},
+							{
+								"type": "column",
+								"column_name": "due_date"
+							},
+							{
+								"type": "column",
+								"column_name": "posting_date"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "against_voucher"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "days_overdue",
+						"data_type": "Integer",
+						"expression": {
+							"type": "expression",
+							"expression": "date_diff(today(), due_date, 'day')"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "bucket",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "cases((days_overdue <= 0, '1. Not Due'), (days_overdue <= 30, '2. 1-30 Days'), (days_overdue <= 60, '3. 31-60 Days'), (days_overdue <= 90, '4. 61-90 Days'), else_='5. 90+ Days')"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "overdue_outstanding",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(days_overdue > 0, outstanding, 0)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "over60_outstanding",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(days_overdue > 60, outstanding, 0)"
+						}
+					}
+				]
+			},
+			"tq-ap": {
+				"name": "tq-ap",
+				"title": "AP Open Invoices",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 3,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabPayment Ledger Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "delinked"
+								},
+								"operator": "=",
+								"value": 0
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "party_type"
+								},
+								"operator": "=",
+								"value": "Supplier"
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "against_voucher_type"
+								},
+								"operator": "=",
+								"value": "Purchase Invoice"
+							}
+						]
+					},
+					{
+						"type": "summarize",
+						"measures": [
+							{
+								"measure_name": "outstanding",
+								"expression": {
+									"type": "expression",
+									"expression": "sum(amount)"
+								},
+								"data_type": "Decimal"
+							}
+						],
+						"dimensions": [
+							{
+								"dimension_name": "against_voucher",
+								"column_name": "against_voucher_no",
+								"data_type": "String"
+							}
+						]
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "outstanding"
+								},
+								"operator": ">",
+								"value": 0.5
+							}
+						]
+					},
+					{
+						"type": "rename",
+						"column": {
+							"type": "column",
+							"column_name": "against_voucher"
+						},
+						"new_name": "invoice"
+					},
+					{
+						"type": "join",
+						"join_type": "inner",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabPurchase Invoice"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "company"
+							},
+							{
+								"type": "column",
+								"column_name": "supplier"
+							},
+							{
+								"type": "column",
+								"column_name": "supplier_name"
+							},
+							{
+								"type": "column",
+								"column_name": "due_date"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "invoice"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "days_overdue",
+						"data_type": "Integer",
+						"expression": {
+							"type": "expression",
+							"expression": "date_diff(today(), due_date, 'day')"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "bucket",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "cases((days_overdue <= 0, '1. Not Due'), (days_overdue <= 30, '2. 1-30 Days'), (days_overdue <= 60, '3. 31-60 Days'), (days_overdue <= 90, '4. 61-90 Days'), else_='5. 90+ Days')"
+						}
+					}
+				]
+			},
+			"tq-cashflow": {
+				"name": "tq-cashflow",
+				"title": "Payments Cash Flow",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 4,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabPayment Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "payment_type"
+								},
+								"operator": "in",
+								"value": [
+									"Receive",
+									"Pay"
+								]
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "flow",
+						"data_type": "String",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(payment_type == 'Receive', 'Inflows', 'Outflows')"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "amount",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(payment_type == 'Receive', base_received_amount, base_paid_amount)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "net_amount",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(payment_type == 'Receive', base_received_amount, - base_paid_amount)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "inflow",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(payment_type == 'Receive', base_received_amount, 0)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "outflow",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(payment_type == 'Pay', base_paid_amount, 0)"
+						}
+					}
+				]
+			},
+			"tq-stock-bins": {
+				"name": "tq-stock-bins",
+				"title": "Stock Balances",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 5,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabBin"
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "inner",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabItem"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "item_name"
+							},
+							{
+								"type": "column",
+								"column_name": "item_group"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "item_code"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "item_code"
+							}
+						}
+					},
+					{
+						"type": "select",
+						"column_names": [
+							"item_code",
+							"item_name",
+							"item_group",
+							"warehouse",
+							"company",
+							"actual_qty",
+							"stock_value",
+							"default_currency"
+						]
+					}
+				]
+			},
+			"tq-stock-movements": {
+				"name": "tq-stock-movements",
+				"title": "Stock Movements",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 6,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabStock Ledger Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "is_cancelled"
+								},
+								"operator": "=",
+								"value": 0
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "incoming_value",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(actual_qty > 0, stock_value_difference, 0)"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "outgoing_value",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(actual_qty < 0, abs(stock_value_difference), 0)"
+						}
+					}
+				]
+			},
+			"tq-opportunities": {
+				"name": "tq-opportunities",
+				"title": "Opportunities",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 7,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabOpportunity"
+						}
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					}
+				]
+			},
+			"tq-employees": {
+				"name": "tq-employees",
+				"title": "Employees",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 8,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabEmployee"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Active"
+							}
+						]
+					}
+				]
+			},
+			"tq-salary-slips": {
+				"name": "tq-salary-slips",
+				"title": "Salary Slips",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 9,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabSalary Slip"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					}
+				]
+			},
+			"tq-sales-orders": {
+				"name": "tq-sales-orders",
+				"title": "Sales Orders",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 11,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabSales Order"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "pending_value",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "base_grand_total - advance_paid"
+						}
+					},
+					{
+						"type": "mutate",
+						"new_name": "is_pending",
+						"data_type": "Integer",
+						"expression": {
+							"type": "expression",
+							"expression": "if_else(is_in(status, 'To Deliver and Bill', 'To Bill', 'To Deliver', 'To Pay'), 1, 0)"
+						}
+					},
+					{
+						"type": "select",
+						"column_names": [
+							"name",
+							"customer",
+							"customer_name",
+							"status",
+							"transaction_date",
+							"delivery_date",
+							"company",
+							"base_grand_total",
+							"advance_paid",
+							"pending_value",
+							"is_pending",
+							"default_currency"
+						]
+					}
+				]
+			},
+			"tq-pdc-payable": {
+				"name": "tq-pdc-payable",
+				"title": "PDC Pending Payable",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 12,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabPayment Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "docstatus"
+								},
+								"operator": "=",
+								"value": 1
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "payment_type"
+								},
+								"operator": "=",
+								"value": "Pay"
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "custom_pdc_payment"
+								},
+								"operator": "=",
+								"value": 1
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "custom_pdc_status"
+								},
+								"operator": "=",
+								"value": "Pending"
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "left",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabCompany"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "default_currency"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "company"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "select",
+						"column_names": [
+							"name",
+							"party",
+							"party_name",
+							"reference_no",
+							"reference_date",
+							"posting_date",
+							"base_paid_amount",
+							"paid_amount",
+							"custom_pdc_status",
+							"company",
+							"default_currency"
+						]
+					}
+				]
+			},
+			"tq-cash-bank-gl": {
+				"name": "tq-cash-bank-gl",
+				"title": "Cash and Bank GL",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 13,
+				"use_live_connection": 1,
+				"is_script_query": 0,
+				"is_builder_query": 1,
+				"is_native_query": 0,
+				"operations": [
+					{
+						"type": "source",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabGL Entry"
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "is_cancelled"
+								},
+								"operator": "=",
+								"value": 0
+							}
+						]
+					},
+					{
+						"type": "join",
+						"join_type": "inner",
+						"table": {
+							"type": "table",
+							"data_source": "Site DB",
+							"table_name": "tabAccount"
+						},
+						"select_columns": [
+							{
+								"type": "column",
+								"column_name": "account_type"
+							},
+							{
+								"type": "column",
+								"column_name": "account_name"
+							},
+							{
+								"type": "column",
+								"column_name": "is_group"
+							}
+						],
+						"join_condition": {
+							"left_column": {
+								"type": "column",
+								"column_name": "account"
+							},
+							"right_column": {
+								"type": "column",
+								"column_name": "name"
+							}
+						}
+					},
+					{
+						"type": "filter_group",
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "is_group"
+								},
+								"operator": "=",
+								"value": 0
+							},
+							{
+								"column": {
+									"type": "column",
+									"column_name": "account_type"
+								},
+								"operator": "in",
+								"value": [
+									"Cash",
+									"Bank"
+								]
+							}
+						]
+					},
+					{
+						"type": "mutate",
+						"new_name": "balance",
+						"data_type": "Decimal",
+						"expression": {
+							"type": "expression",
+							"expression": "debit - credit"
+						}
+					},
+					{
+						"type": "select",
+						"column_names": [
+							"account",
+							"account_name",
+							"account_type",
+							"company",
+							"posting_date",
+							"balance"
+						]
+					}
+				]
+			}
+		},
+		"charts": {
+			"tc-pl-trend": {
+				"name": "tc-pl-trend",
+				"title": "P/L Components, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 1,
+				"query": "tq-gl-pl",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "posting_date",
+							"column_name": "posting_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Sales",
+									"data_type": "Decimal",
+									"column_name": "sales_amount",
+									"aggregation": "sum"
+								}
+							},
+							{
+								"measure": {
+									"measure_name": "Direct Costs",
+									"data_type": "Decimal",
+									"column_name": "direct_cost",
+									"aggregation": "sum"
+								}
+							},
+							{
+								"measure": {
+									"measure_name": "Operating Costs",
+									"data_type": "Decimal",
+									"column_name": "operating_cost",
+									"aggregation": "sum"
+								}
+							}
+						],
+						"show_data_labels": false
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "posting_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-gp-margin": {
+				"name": "tc-gp-margin",
+				"title": "Gross Profit Margin",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 2,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Gross Profit Margin %",
+							"data_type": "Decimal",
+							"expression": {
+								"type": "expression",
+								"expression": "if_else(sum(sales_amount) != 0, (sum(sales_amount) - sum(direct_cost)) / sum(sales_amount) * 100, 0)"
+							}
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false
+						}
+					],
+					"sparkline": false,
+					"suffix": "%",
+					"decimal": 1,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-net-revenue": {
+				"name": "tc-net-revenue",
+				"title": "Net Revenue",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 3,
+				"query": "tq-sales-invoices",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Net Revenue",
+							"data_type": "Decimal",
+							"column_name": "base_net_total",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true,
+							"comparison": {
+								"source": "previous"
+							}
+						}
+					],
+					"sparkline": true,
+					"date_column": {
+						"dimension_name": "posting_date",
+						"column_name": "posting_date",
+						"data_type": "Date"
+					},
+					"window": {
+						"grain": "month"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-total-ap": {
+				"name": "tc-total-ap",
+				"title": "Total AP",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 5,
+				"query": "tq-ap",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Total AP",
+							"data_type": "Decimal",
+							"column_name": "outstanding",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-ar-ageing": {
+				"name": "tc-ar-ageing",
+				"title": "AR Ageing",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 6,
+				"query": "tq-ar",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "Ageing Bucket",
+							"column_name": "bucket",
+							"data_type": "String"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Outstanding",
+									"data_type": "Decimal",
+									"column_name": "outstanding",
+									"aggregation": "sum",
+									"format": "currency",
+									"currency_column": "default_currency"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Ageing Bucket"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-cash-trend": {
+				"name": "tc-cash-trend",
+				"title": "Inflows vs Outflows, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 8,
+				"query": "tq-cashflow",
+				"chart_type": "Line",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "posting_date",
+							"column_name": "posting_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Inflows",
+									"data_type": "Decimal",
+									"column_name": "inflow",
+									"aggregation": "sum"
+								}
+							},
+							{
+								"measure": {
+									"measure_name": "Outflows",
+									"data_type": "Decimal",
+									"column_name": "outflow",
+									"aggregation": "sum"
+								}
+							},
+							{
+								"measure": {
+									"measure_name": "Net",
+									"data_type": "Decimal",
+									"column_name": "net_amount",
+									"aggregation": "sum"
+								},
+								"type": "line",
+								"align": "Right"
+							}
+						],
+						"smooth": true,
+						"show_area": false
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "posting_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-stock-by-warehouse": {
+				"name": "tc-stock-by-warehouse",
+				"title": "Stock Value by Warehouse",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 10,
+				"query": "tq-stock-bins",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "warehouse",
+							"column_name": "warehouse",
+							"data_type": "String"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Stock Value",
+									"data_type": "Decimal",
+									"column_name": "stock_value",
+									"aggregation": "sum"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Stock Value"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 10,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-stock-movement": {
+				"name": "tc-stock-movement",
+				"title": "Stock In vs Out Value, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 11,
+				"query": "tq-stock-movements",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "posting_date",
+							"column_name": "posting_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Incoming",
+									"data_type": "Decimal",
+									"column_name": "incoming_value",
+									"aggregation": "sum"
+								}
+							},
+							{
+								"measure": {
+									"measure_name": "Outgoing",
+									"data_type": "Decimal",
+									"column_name": "outgoing_value",
+									"aggregation": "sum"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "posting_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pipeline-by-stage": {
+				"name": "tc-pipeline-by-stage",
+				"title": "Pipeline Value by Sales Stage",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 13,
+				"query": "tq-opportunities",
+				"chart_type": "Funnel",
+				"config": {
+					"label_column": {
+						"dimension_name": "sales_stage",
+						"column_name": "sales_stage",
+						"data_type": "String"
+					},
+					"value_column": {
+						"measure_name": "Pipeline Value",
+						"data_type": "Decimal",
+						"column_name": "base_opportunity_amount",
+						"aggregation": "sum",
+						"format": "currency",
+						"currency_column": "default_currency"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-pipeline-monthly": {
+				"name": "tc-pipeline-monthly",
+				"title": "Open Pipeline Value, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 14,
+				"query": "tq-opportunities",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "transaction_date",
+							"column_name": "transaction_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Pipeline Value",
+									"data_type": "Decimal",
+									"column_name": "base_opportunity_amount",
+									"aggregation": "sum",
+									"format": "currency",
+									"currency_column": "default_currency"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "transaction_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-top-customers": {
+				"name": "tc-top-customers",
+				"title": "Key Account Revenue Concentration",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 15,
+				"query": "tq-sales-invoices",
+				"chart_type": "Donut",
+				"config": {
+					"label_column": {
+						"dimension_name": "customer_name",
+						"column_name": "customer_name",
+						"data_type": "String"
+					},
+					"value_column": {
+						"measure_name": "Revenue",
+						"data_type": "Decimal",
+						"column_name": "base_net_total",
+						"aggregation": "sum",
+						"format": "currency",
+						"currency_column": "default_currency"
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Revenue"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 8,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-top-sales-reps": {
+				"name": "tc-top-sales-reps",
+				"title": "Top Sales Reps by Revenue",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 16,
+				"query": "tq-sales-invoices",
+				"chart_type": "Row",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "owner",
+							"column_name": "owner",
+							"data_type": "String"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Revenue",
+									"data_type": "Decimal",
+									"column_name": "base_net_total",
+									"aggregation": "sum",
+									"format": "currency",
+									"currency_column": "default_currency"
+								}
+							}
+						]
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "Revenue"
+							},
+							"direction": "desc"
+						}
+					],
+					"limit": 5,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-revenue-trend": {
+				"name": "tc-revenue-trend",
+				"title": "Net Revenue, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 17,
+				"query": "tq-sales-invoices",
+				"chart_type": "Line",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "posting_date",
+							"column_name": "posting_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Net Revenue",
+									"data_type": "Decimal",
+									"column_name": "base_net_total",
+									"aggregation": "sum",
+									"format": "currency",
+									"currency_column": "default_currency"
+								}
+							}
+						],
+						"smooth": true,
+						"show_area": true
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "posting_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-headcount": {
+				"name": "tc-headcount",
+				"title": "Headcount and Payroll",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 18,
+				"query": "tq-employees",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Active Headcount",
+							"data_type": "Integer",
+							"column_name": "name",
+							"aggregation": "count"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-payroll": {
+				"name": "tc-payroll",
+				"title": "Payroll Cost",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 19,
+				"query": "tq-salary-slips",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Payroll Cost",
+							"data_type": "Decimal",
+							"column_name": "base_gross_pay",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true,
+							"comparison": {
+								"source": "previous"
+							}
+						}
+					],
+					"sparkline": true,
+					"date_column": {
+						"dimension_name": "end_date",
+						"column_name": "end_date",
+						"data_type": "Date"
+					},
+					"window": {
+						"grain": "month"
+					},
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-opex-trend": {
+				"name": "tc-opex-trend",
+				"title": "Operating Costs, per Month",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 20,
+				"query": "tq-gl-pl",
+				"chart_type": "Line",
+				"config": {
+					"x_axis": {
+						"dimension": {
+							"dimension_name": "posting_date",
+							"column_name": "posting_date",
+							"data_type": "Date",
+							"granularity": "month"
+						}
+					},
+					"y_axis": {
+						"series": [
+							{
+								"measure": {
+									"measure_name": "Operating Costs",
+									"data_type": "Decimal",
+									"column_name": "operating_cost",
+									"aggregation": "sum"
+								}
+							}
+						],
+						"smooth": true,
+						"show_area": true
+					},
+					"order_by": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "posting_date"
+							},
+							"direction": "asc"
+						}
+					],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pending-so": {
+				"name": "tc-pending-so",
+				"title": "Pending Sales Orders Value",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 30,
+				"query": "tq-sales-orders",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Pending SO Value",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(if_else(is_pending == 1, pending_value, 0))"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-total-so": {
+				"name": "tc-total-so",
+				"title": "Total Sales Orders",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 31,
+				"query": "tq-sales-orders",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Total Sales Orders",
+							"expression": {
+								"type": "expression",
+								"expression": "count(name)"
+							},
+							"data_type": "Integer"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-pdc-payable": {
+				"name": "tc-pdc-payable",
+				"title": "PDC Pending Payable",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 32,
+				"query": "tq-pdc-payable",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "PDC Pending Payable",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(base_paid_amount)"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-cash-hand": {
+				"name": "tc-cash-hand",
+				"title": "Cash in Hand",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 33,
+				"query": "tq-cash-bank-gl",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Cash in Hand",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(if_else(account_type == 'Cash', balance, 0))"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-cash-bank": {
+				"name": "tc-cash-bank",
+				"title": "Cash in Bank",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 34,
+				"query": "tq-cash-bank-gl",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Cash in Bank",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(if_else(account_type == 'Bank', balance, 0))"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-net-cash-bal": {
+				"name": "tc-net-cash-bal",
+				"title": "Net Cash",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 35,
+				"query": "tq-cash-bank-gl",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Net Cash",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(balance)"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-hr-kpi": {
+				"name": "tc-hr-kpi",
+				"title": "HR KPI",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 36,
+				"query": "tq-employees",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Active Headcount",
+							"expression": {
+								"type": "expression",
+								"expression": "count(name)"
+							},
+							"data_type": "Integer"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			},
+			"tc-pending-so-table": {
+				"name": "tc-pending-so-table",
+				"title": "Pending Orders by Customer",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 40,
+				"query": "tq-sales-orders",
+				"chart_type": "Table",
+				"config": {
+					"rows": [
+						{
+							"dimension_name": "customer",
+							"column_name": "customer",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "status",
+							"column_name": "status",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "delivery_date",
+							"column_name": "delivery_date",
+							"data_type": "Date"
+						}
+					],
+					"columns": [],
+					"measures": [
+						{
+							"measure_name": "Pending Value",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(if_else(is_pending == 1, pending_value, 0))"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"filters": [
+						{
+							"column": {
+								"type": "column",
+								"column_name": "is_pending"
+							},
+							"operator": "=",
+							"value": 1
+						}
+					],
+					"order_by": [],
+					"limit": 100
+				}
+			},
+			"tc-so-by-status": {
+				"name": "tc-so-by-status",
+				"title": "Sales Orders by Status",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 41,
+				"query": "tq-sales-orders",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension_name": "status",
+						"column_name": "status",
+						"data_type": "String"
+					},
+					"y_axis": [
+						{
+							"measure_name": "Orders",
+							"expression": {
+								"type": "expression",
+								"expression": "count(name)"
+							},
+							"data_type": "Integer"
+						}
+					],
+					"filters": [],
+					"order_by": [],
+					"limit": 50
+				}
+			},
+			"tc-pdc-table": {
+				"name": "tc-pdc-table",
+				"title": "Pending PDC Cheques",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 42,
+				"query": "tq-pdc-payable",
+				"chart_type": "Table",
+				"config": {
+					"rows": [
+						{
+							"dimension_name": "reference_no",
+							"column_name": "reference_no",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "party",
+							"column_name": "party",
+							"data_type": "String"
+						},
+						{
+							"dimension_name": "reference_date",
+							"column_name": "reference_date",
+							"data_type": "Date"
+						},
+						{
+							"dimension_name": "custom_pdc_status",
+							"column_name": "custom_pdc_status",
+							"data_type": "String"
+						}
+					],
+					"columns": [],
+					"measures": [
+						{
+							"measure_name": "Amount",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(base_paid_amount)"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"filters": [],
+					"order_by": [],
+					"limit": 100
+				}
+			},
+			"tc-cash-accounts": {
+				"name": "tc-cash-accounts",
+				"title": "Cash and Bank by Account",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 43,
+				"query": "tq-cash-bank-gl",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension_name": "account",
+						"column_name": "account",
+						"data_type": "String"
+					},
+					"y_axis": [
+						{
+							"measure_name": "Balance",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(balance)"
+							},
+							"data_type": "Decimal"
+						}
+					],
+					"filters": [],
+					"order_by": [],
+					"limit": 50
+				}
+			},
+			"tc-emp-by-dept": {
+				"name": "tc-emp-by-dept",
+				"title": "Headcount by Department",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 44,
+				"query": "tq-employees",
+				"chart_type": "Bar",
+				"config": {
+					"x_axis": {
+						"dimension_name": "department",
+						"column_name": "department",
+						"data_type": "String"
+					},
+					"y_axis": [
+						{
+							"measure_name": "Employees",
+							"expression": {
+								"type": "expression",
+								"expression": "count(name)"
+							},
+							"data_type": "Integer"
+						}
+					],
+					"filters": [],
+					"order_by": [],
+					"limit": 50
+				}
+			},
+			"tc-pl-sales": {
+				"name": "tc-pl-sales",
+				"title": "Sales",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 0,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Sales",
+							"data_type": "Decimal",
+							"column_name": "sales_amount",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pl-direct-costs": {
+				"name": "tc-pl-direct-costs",
+				"title": "Direct Costs",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 1,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Direct Costs",
+							"data_type": "Decimal",
+							"column_name": "direct_cost",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pl-gross-profit": {
+				"name": "tc-pl-gross-profit",
+				"title": "Gross Profit",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 2,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Gross Profit",
+							"data_type": "Decimal",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(sales_amount) - sum(direct_cost)"
+							},
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pl-operating-costs": {
+				"name": "tc-pl-operating-costs",
+				"title": "Operating Costs",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 3,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Operating Costs",
+							"data_type": "Decimal",
+							"column_name": "operating_cost",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pl-net-profit": {
+				"name": "tc-pl-net-profit",
+				"title": "Net Profit",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 4,
+				"query": "tq-gl-pl",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Net Profit",
+							"data_type": "Decimal",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(sales_amount) - sum(direct_cost) - sum(operating_cost)"
+							},
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-ar-ap-total-ar": {
+				"name": "tc-ar-ap-total-ar",
+				"title": "Total AR",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 40,
+				"query": "tq-ar",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Total AR",
+							"data_type": "Decimal",
+							"column_name": "outstanding",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-ar-ap-ar-overdue---60-days": {
+				"name": "tc-ar-ap-ar-overdue---60-days",
+				"title": "AR Overdue > 60 Days",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 41,
+				"query": "tq-ar",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "AR Overdue > 60 Days",
+							"data_type": "Decimal",
+							"column_name": "over60_outstanding",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-ar-ap-ar-overdue": {
+				"name": "tc-ar-ap-ar-overdue",
+				"title": "AR Overdue %",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 42,
+				"query": "tq-ar",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "AR Overdue %",
+							"data_type": "Decimal",
+							"expression": {
+								"type": "expression",
+								"expression": "if_else(sum(outstanding) != 0, sum(overdue_outstanding) / sum(outstanding) * 100, 0)"
+							}
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-cash-kpis-inflows": {
+				"name": "tc-cash-kpis-inflows",
+				"title": "Inflows",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 70,
+				"query": "tq-cashflow",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Inflows",
+							"data_type": "Decimal",
+							"column_name": "inflow",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-cash-kpis-outflows": {
+				"name": "tc-cash-kpis-outflows",
+				"title": "Outflows",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 71,
+				"query": "tq-cashflow",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Outflows",
+							"data_type": "Decimal",
+							"column_name": "outflow",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-cash-kpis-net-cash-flow": {
+				"name": "tc-cash-kpis-net-cash-flow",
+				"title": "Net Cash Flow",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 72,
+				"query": "tq-cashflow",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Net Cash Flow",
+							"data_type": "Decimal",
+							"column_name": "net_amount",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-stock-value-total-stock-value": {
+				"name": "tc-stock-value-total-stock-value",
+				"title": "Total Stock Value",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 90,
+				"query": "tq-stock-bins",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Total Stock Value",
+							"data_type": "Decimal",
+							"column_name": "stock_value",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-stock-value-stock-skus": {
+				"name": "tc-stock-value-stock-skus",
+				"title": "Stock SKUs",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 91,
+				"query": "tq-stock-bins",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Stock SKUs",
+							"data_type": "Integer",
+							"column_name": "item_code",
+							"aggregation": "count_distinct"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": []
+					}
+				}
+			},
+			"tc-pipeline-kpis-open-opportunities": {
+				"name": "tc-pipeline-kpis-open-opportunities",
+				"title": "Open Opportunities",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 120,
+				"query": "tq-opportunities",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Open Opportunities",
+							"column_name": "name",
+							"data_type": "Integer",
+							"aggregation": "count"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": false
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-pipeline-kpis-pipeline-value": {
+				"name": "tc-pipeline-kpis-pipeline-value",
+				"title": "Pipeline Value",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 121,
+				"query": "tq-opportunities",
+				"chart_type": "Number",
+				"config": {
+					"number_columns": [
+						{
+							"measure_name": "Pipeline Value",
+							"data_type": "Decimal",
+							"column_name": "base_opportunity_amount",
+							"aggregation": "sum",
+							"format": "currency",
+							"currency_column": "default_currency"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false,
+					"order_by": [],
+					"limit": 100,
+					"filters": {
+						"logical_operator": "And",
+						"filters": [
+							{
+								"column": {
+									"type": "column",
+									"column_name": "status"
+								},
+								"operator": "=",
+								"value": "Open"
+							}
+						]
+					}
+				}
+			},
+			"tc-total-so-open": {
+				"name": "tc-total-so-open",
+				"title": "Open Orders",
+				"workbook": "template-ceo-command-center",
+				"folder": null,
+				"sort_order": 31,
+				"query": "tq-sales-orders",
+				"chart_type": "Number",
+				"config": {
+					"filters": [],
+					"order_by": [],
+					"limit": 100,
+					"number_columns": [
+						{
+							"measure_name": "Open Orders",
+							"expression": {
+								"type": "expression",
+								"expression": "sum(is_pending)"
+							},
+							"data_type": "Integer"
+						}
+					],
+					"number_column_options": [
+						{
+							"shorten_numbers": true
+						}
+					],
+					"sparkline": false
+				}
+			}
+		},
+		"dashboards": {
+			"td-ceo-command-center": {
+				"name": "td-ceo-command-center",
+				"title": "CEO Command Center",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"column": null,
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 5,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"column": null,
+						"filter_name": "Company",
+						"filter_type": "String",
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 5,
+							"y": 0,
+							"w": 5,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pending-so",
+						"layout": {
+							"i": "kpi-pso",
+							"x": 0,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-total-so",
+						"layout": {
+							"i": "kpi-tso",
+							"x": 4,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-value-total-stock-value",
+						"layout": {
+							"i": "kpi-stk",
+							"x": 8,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ap-total-ar",
+						"layout": {
+							"i": "kpi-ar",
+							"x": 12,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-total-ap",
+						"layout": {
+							"i": "kpi-ap",
+							"x": 16,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pdc-payable",
+						"layout": {
+							"i": "kpi-pdc",
+							"x": 0,
+							"y": 7,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-hand",
+						"layout": {
+							"i": "kpi-cash",
+							"x": 4,
+							"y": 7,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-net-cash-bal",
+						"layout": {
+							"i": "kpi-net",
+							"x": 8,
+							"y": 7,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-bank",
+						"layout": {
+							"i": "kpi-bank",
+							"x": 12,
+							"y": 7,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-headcount",
+						"layout": {
+							"i": "kpi-hc",
+							"x": 16,
+							"y": 7,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-payroll",
+						"layout": {
+							"i": "kpi-pay",
+							"x": 0,
+							"y": 12,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-hr-kpi",
+						"layout": {
+							"i": "kpi-hr",
+							"x": 4,
+							"y": 12,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-sales",
+						"layout": {
+							"i": "pl-sales",
+							"x": 0,
+							"y": 17,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-direct-costs",
+						"layout": {
+							"i": "pl-direct",
+							"x": 4,
+							"y": 17,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-gross-profit",
+						"layout": {
+							"i": "pl-gp",
+							"x": 8,
+							"y": 17,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-operating-costs",
+						"layout": {
+							"i": "pl-opex",
+							"x": 12,
+							"y": 17,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-net-profit",
+						"layout": {
+							"i": "pl-np",
+							"x": 16,
+							"y": 17,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-net-revenue",
+						"layout": {
+							"i": "net-rev",
+							"x": 0,
+							"y": 22,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-gp-margin",
+						"layout": {
+							"i": "gp-margin",
+							"x": 5,
+							"y": 22,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ap-ar-overdue---60-days",
+						"layout": {
+							"i": "ar-over60",
+							"x": 10,
+							"y": 22,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ap-ar-overdue",
+						"layout": {
+							"i": "ar-overdue-pct",
+							"x": 15,
+							"y": 22,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-inflows",
+						"layout": {
+							"i": "cash-in",
+							"x": 0,
+							"y": 27,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-outflows",
+						"layout": {
+							"i": "cash-out",
+							"x": 5,
+							"y": 27,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-net-cash-flow",
+						"layout": {
+							"i": "cash-net",
+							"x": 10,
+							"y": 27,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-value-stock-skus",
+						"layout": {
+							"i": "stock-skus",
+							"x": 15,
+							"y": 27,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pl-trend",
+						"layout": {
+							"i": "pl-trend",
+							"x": 0,
+							"y": 32,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-trend",
+						"layout": {
+							"i": "cash-trend",
+							"x": 10,
+							"y": 32,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-revenue-trend",
+						"layout": {
+							"i": "rev-trend",
+							"x": 0,
+							"y": 48,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ageing",
+						"layout": {
+							"i": "ar-age",
+							"x": 10,
+							"y": 48,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-by-warehouse",
+						"layout": {
+							"i": "stock-wh",
+							"x": 0,
+							"y": 64,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-movement",
+						"layout": {
+							"i": "stock-move",
+							"x": 10,
+							"y": 64,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-kpis-open-opportunities",
+						"layout": {
+							"i": "pipe-open",
+							"x": 0,
+							"y": 80,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-kpis-pipeline-value",
+						"layout": {
+							"i": "pipe-val",
+							"x": 5,
+							"y": 80,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-by-stage",
+						"layout": {
+							"i": "pipe-funnel",
+							"x": 10,
+							"y": 80,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pipeline-monthly",
+						"layout": {
+							"i": "pipe-month",
+							"x": 0,
+							"y": 85,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-top-customers",
+						"layout": {
+							"i": "top-cust",
+							"x": 10,
+							"y": 85,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-top-sales-reps",
+						"layout": {
+							"i": "top-reps",
+							"x": 0,
+							"y": 101,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-emp-by-dept",
+						"layout": {
+							"i": "emp-dept",
+							"x": 10,
+							"y": 101,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-opex-trend",
+						"layout": {
+							"i": "opex-trend",
+							"x": 0,
+							"y": 117,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-pending-so": {
+				"name": "td-pending-so",
+				"title": "Pending Sales Orders",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pending-so",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pending-so-table",
+						"layout": {
+							"i": "tbl",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-total-so": {
+				"name": "td-total-so",
+				"title": "Total Sales Orders",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-total-so",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-total-so",
+						"layout": {
+							"i": "kpi2",
+							"x": 5,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-so-by-status",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-total-stock": {
+				"name": "td-total-stock",
+				"title": "Total Stock",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-value-total-stock-value",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-value-stock-skus",
+						"layout": {
+							"i": "kpi2",
+							"x": 5,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-stock-by-warehouse",
+						"layout": {
+							"i": "wh",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-total-ar": {
+				"name": "td-total-ar",
+				"title": "Total A/R",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ap-total-ar",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-ar-ageing",
+						"layout": {
+							"i": "age",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-total-ap": {
+				"name": "td-total-ap",
+				"title": "Total A/P",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-total-ap",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					}
+				]
+			},
+			"td-pdc-payable": {
+				"name": "td-pdc-payable",
+				"title": "PDC Pending Payable",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pdc-payable",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-pdc-table",
+						"layout": {
+							"i": "tbl",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-cash-hand": {
+				"name": "td-cash-hand",
+				"title": "Cash in Hand",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-hand",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-accounts",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-net-cash": {
+				"name": "td-net-cash",
+				"title": "Net Cash",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-net-cash-bal",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-inflows",
+						"layout": {
+							"i": "in",
+							"x": 5,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-outflows",
+						"layout": {
+							"i": "out",
+							"x": 9,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-kpis-net-cash-flow",
+						"layout": {
+							"i": "flow",
+							"x": 13,
+							"y": 2,
+							"w": 4,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-accounts",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 10,
+							"h": 16
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-trend",
+						"layout": {
+							"i": "trend",
+							"x": 10,
+							"y": 7,
+							"w": 10,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-cash-bank": {
+				"name": "td-cash-bank",
+				"title": "Cash in Bank",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-bank",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-cash-accounts",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-headcount": {
+				"name": "td-headcount",
+				"title": "Total Head Count",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-headcount",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-emp-by-dept",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			},
+			"td-salary": {
+				"name": "td-salary",
+				"title": "Salary Total",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-payroll",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					}
+				]
+			},
+			"td-hr-kpi": {
+				"name": "td-hr-kpi",
+				"title": "HR KPI",
+				"workbook": "template-ceo-command-center",
+				"items": [
+					{
+						"type": "filter",
+						"filter_name": "Date Range",
+						"filter_type": "Date",
+						"column": null,
+						"default_operator": "within",
+						"default_value": "Last 12 months",
+						"layout": {
+							"i": "f-date",
+							"x": 0,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "filter",
+						"filter_name": "Company",
+						"filter_type": "String",
+						"column": null,
+						"default_operator": "=",
+						"default_value": null,
+						"layout": {
+							"i": "f-co",
+							"x": 10,
+							"y": 0,
+							"w": 10,
+							"h": 2
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-hr-kpi",
+						"layout": {
+							"i": "kpi",
+							"x": 0,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-headcount",
+						"layout": {
+							"i": "hc",
+							"x": 5,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-payroll",
+						"layout": {
+							"i": "pay",
+							"x": 10,
+							"y": 2,
+							"w": 5,
+							"h": 5
+						}
+					},
+					{
+						"type": "chart",
+						"chart": "tc-emp-by-dept",
+						"layout": {
+							"i": "bar",
+							"x": 0,
+							"y": 7,
+							"w": 20,
+							"h": 16
+						}
+					}
+				]
+			}
+		}
+	}
+}

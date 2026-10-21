@@ -1,0 +1,16 @@
+{
+	"version": 1,
+	"title": "CRM Pipeline",
+	"description": "Lead volume, pipeline value and quotation progress at a glance \u2014 open KPIs, lead trend and mix by status/source, opportunity value by sales stage, a lead-to-quotation funnel and an open-opportunities list.",
+	"notes": "Built from Leads (enabled only), Opportunities and submitted Quotations. Pipeline amounts use each Opportunity's base currency via Company.default_currency, so a reading that spans companies with different currencies prints bare. Lead source uses utm_source (blank shown as Unknown). Open Leads exclude status Converted; open Opportunities/Quotations use status Open. Readers need Lead, Opportunity, Quotation and Company tables.",
+	"module": "CRM",
+	"required_apps": [
+		"erpnext"
+	],
+	"source_doctypes": [
+		"Lead",
+		"Opportunity",
+		"Quotation",
+		"Company"
+	]
+}

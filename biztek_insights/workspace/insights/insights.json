@@ -1,0 +1,45 @@
+{
+ "app": "biztek_insights",
+ "charts": [],
+ "content": "[]",
+ "creation": "2026-09-23 16:46:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "external_link": "/insights/dashboards",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "chart-line",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Insights",
+ "link_to": "",
+ "link_type": "",
+ "links": [],
+ "modified": "2026-09-23 16:46:00.000000",
+ "modified_by": "Administrator",
+ "module": "Biztek Insights",
+ "name": "Insights",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 0,
+ "quick_lists": [],
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Insights Admin"
+  },
+  {
+   "role": "Insights User"
+  }
+ ],
+ "sequence_id": 5.5,
+ "shortcuts": [],
+ "title": "Insights",
+ "type": "URL"
+}
