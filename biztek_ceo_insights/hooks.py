@@ -39,7 +39,7 @@ app_include_js = ["/assets/biztek_ceo_insights/js/desk_topbar_url.js?v=4"]
 # ------------------
 
 # include js, css files in header of desk.html
-# KPI page CSS is loaded from the page JS (not global desk include)
+# app_include_css = "/assets/biztek_ceo_insights/css/biztek_ceo_insights.css"
 # app_include_js = "/assets/biztek_ceo_insights/js/biztek_ceo_insights.js"
 
 # include js, css files in header of web template

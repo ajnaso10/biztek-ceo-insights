@@ -1,8 +1,8 @@
 {
-	"version": 5,
+	"version": 7,
 	"title": "CEO Command Center",
-	"description": "Executive KPI cards (Pending SO, Total SO, Stock, AR/AP, PDC Payable, Cash in Hand/Bank/Net Cash, Headcount, Payroll, HR) with detail dashboards, plus P/L, cash flow, inventory, pipeline.",
-	"notes": "Card formulas: Pending SO = submitted SO in To Deliver and Bill/To Bill/To Deliver/To Pay, sum(base_grand_total - advance_paid). Total SO = count in period. Stock = Bin.stock_value. AR/AP = Payment Ledger outstanding. PDC Pending Payable = PE custom_pdc_payment + Pending + Pay (requires pdc_cheques). Cash in Hand/Bank/Net Cash on the Desk KPI page use get_balance_on (excludes Company PDC accounts); workbook GL sum approximates live balances when date filter is not applied. Headcount = Active Employee. Salary = submitted Salary Slip base_gross_pay (Payroll Cost Gross). HR KPI = headcount mosaic with hires/exits (no weighted score). Desk page: ceo-insight-dashboard. After deploy, Insights \u2192 Templates \u2192 update CEO Command Center. Number charts are one-measure-per-card for Insights v3 layout.",
+	"description": "Insights-only executive KPI board (Pending SO, Total SO, Stock, AR/AP, PDC Payable, Cash in Hand/Bank/Net Cash, Headcount, Payroll, HR) plus P/L and trends. Detail boards are separate dashboards in the same workbook; card→detail navigation is not wired yet.",
+	"notes": "Insights-only CEO board. Number charts one measure each. Layout: Insights 20-col grid; filters h=1; KPI cards in rows of 5 (w=4 h=4). Separate detail dashboards; card→detail not wired. After deploy: Insights → Templates → update CEO Command Center.",
 	"module": "Accounts",
 	"required_apps": [
 		"erpnext"

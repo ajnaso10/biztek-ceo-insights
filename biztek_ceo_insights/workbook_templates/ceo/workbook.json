@@ -2993,11 +2993,12 @@
 						"default_operator": "within",
 						"default_value": "Last 12 months",
 						"layout": {
+							"h": 1,
 							"i": "f-date",
+							"moved": false,
+							"w": 10,
 							"x": 0,
-							"y": 0,
-							"w": 5,
-							"h": 2
+							"y": 0
 						}
 					},
 					{
@@ -3008,440 +3009,480 @@
 						"default_operator": "=",
 						"default_value": null,
 						"layout": {
+							"h": 1,
 							"i": "f-co",
-							"x": 5,
-							"y": 0,
-							"w": 5,
-							"h": 2
+							"moved": false,
+							"w": 10,
+							"x": 10,
+							"y": 0
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pending-so",
 						"layout": {
+							"h": 4,
 							"i": "kpi-pso",
-							"x": 0,
-							"y": 2,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 0,
+							"y": 1
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-total-so",
 						"layout": {
+							"h": 4,
 							"i": "kpi-tso",
-							"x": 4,
-							"y": 2,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 4,
+							"y": 1
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-stock-value-total-stock-value",
 						"layout": {
+							"h": 4,
 							"i": "kpi-stk",
-							"x": 8,
-							"y": 2,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 8,
+							"y": 1
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-ar-ap-total-ar",
 						"layout": {
+							"h": 4,
 							"i": "kpi-ar",
-							"x": 12,
-							"y": 2,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 12,
+							"y": 1
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-total-ap",
 						"layout": {
+							"h": 4,
 							"i": "kpi-ap",
-							"x": 16,
-							"y": 2,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 16,
+							"y": 1
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pdc-payable",
 						"layout": {
+							"h": 4,
 							"i": "kpi-pdc",
-							"x": 0,
-							"y": 7,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 0,
+							"y": 5
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-hand",
 						"layout": {
+							"h": 4,
 							"i": "kpi-cash",
-							"x": 4,
-							"y": 7,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 4,
+							"y": 5
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-net-cash-bal",
 						"layout": {
+							"h": 4,
 							"i": "kpi-net",
-							"x": 8,
-							"y": 7,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 8,
+							"y": 5
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-bank",
 						"layout": {
+							"h": 4,
 							"i": "kpi-bank",
-							"x": 12,
-							"y": 7,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 12,
+							"y": 5
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-headcount",
 						"layout": {
+							"h": 4,
 							"i": "kpi-hc",
-							"x": 16,
-							"y": 7,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 16,
+							"y": 5
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-payroll",
 						"layout": {
+							"h": 4,
 							"i": "kpi-pay",
-							"x": 0,
-							"y": 12,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 0,
+							"y": 9
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-hr-kpi",
 						"layout": {
+							"h": 4,
 							"i": "kpi-hr",
-							"x": 4,
-							"y": 12,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 4,
+							"y": 9
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-sales",
 						"layout": {
+							"h": 4,
 							"i": "pl-sales",
-							"x": 0,
-							"y": 17,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 0,
+							"y": 14
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-direct-costs",
 						"layout": {
+							"h": 4,
 							"i": "pl-direct",
-							"x": 4,
-							"y": 17,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 4,
+							"y": 14
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-gross-profit",
 						"layout": {
+							"h": 4,
 							"i": "pl-gp",
-							"x": 8,
-							"y": 17,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 8,
+							"y": 14
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-operating-costs",
 						"layout": {
+							"h": 4,
 							"i": "pl-opex",
-							"x": 12,
-							"y": 17,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 12,
+							"y": 14
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-net-profit",
 						"layout": {
+							"h": 4,
 							"i": "pl-np",
-							"x": 16,
-							"y": 17,
+							"moved": false,
 							"w": 4,
-							"h": 5
+							"x": 16,
+							"y": 14
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-net-revenue",
 						"layout": {
+							"h": 4,
 							"i": "net-rev",
-							"x": 0,
-							"y": 22,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 0,
+							"y": 18
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-gp-margin",
 						"layout": {
+							"h": 4,
 							"i": "gp-margin",
-							"x": 5,
-							"y": 22,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 5,
+							"y": 18
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-ar-ap-ar-overdue---60-days",
 						"layout": {
+							"h": 4,
 							"i": "ar-over60",
-							"x": 10,
-							"y": 22,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 10,
+							"y": 18
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-ar-ap-ar-overdue",
 						"layout": {
+							"h": 4,
 							"i": "ar-overdue-pct",
-							"x": 15,
-							"y": 22,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 15,
+							"y": 18
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-kpis-inflows",
 						"layout": {
+							"h": 4,
 							"i": "cash-in",
-							"x": 0,
-							"y": 27,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 0,
+							"y": 22
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-kpis-outflows",
 						"layout": {
+							"h": 4,
 							"i": "cash-out",
-							"x": 5,
-							"y": 27,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 5,
+							"y": 22
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-kpis-net-cash-flow",
 						"layout": {
+							"h": 4,
 							"i": "cash-net",
-							"x": 10,
-							"y": 27,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 10,
+							"y": 22
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-stock-value-stock-skus",
 						"layout": {
+							"h": 4,
 							"i": "stock-skus",
-							"x": 15,
-							"y": 27,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 15,
+							"y": 22
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pl-trend",
 						"layout": {
+							"h": 14,
 							"i": "pl-trend",
-							"x": 0,
-							"y": 32,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 26
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-cash-trend",
 						"layout": {
+							"h": 14,
 							"i": "cash-trend",
-							"x": 10,
-							"y": 32,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 10,
+							"y": 26
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-revenue-trend",
 						"layout": {
+							"h": 14,
 							"i": "rev-trend",
-							"x": 0,
-							"y": 48,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 40
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-ar-ageing",
 						"layout": {
+							"h": 14,
 							"i": "ar-age",
-							"x": 10,
-							"y": 48,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 10,
+							"y": 40
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-stock-by-warehouse",
 						"layout": {
+							"h": 14,
 							"i": "stock-wh",
-							"x": 0,
-							"y": 64,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 54
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-stock-movement",
 						"layout": {
+							"h": 14,
 							"i": "stock-move",
-							"x": 10,
-							"y": 64,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 10,
+							"y": 54
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pipeline-kpis-open-opportunities",
 						"layout": {
+							"h": 4,
 							"i": "pipe-open",
-							"x": 0,
-							"y": 80,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 0,
+							"y": 68
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pipeline-kpis-pipeline-value",
 						"layout": {
+							"h": 4,
 							"i": "pipe-val",
-							"x": 5,
-							"y": 80,
+							"moved": false,
 							"w": 5,
-							"h": 5
+							"x": 5,
+							"y": 68
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pipeline-by-stage",
 						"layout": {
+							"h": 14,
 							"i": "pipe-funnel",
-							"x": 10,
-							"y": 80,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 72
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-pipeline-monthly",
 						"layout": {
+							"h": 14,
 							"i": "pipe-month",
-							"x": 0,
-							"y": 85,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 10,
+							"y": 72
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-top-customers",
 						"layout": {
+							"h": 14,
 							"i": "top-cust",
-							"x": 10,
-							"y": 85,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 86
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-top-sales-reps",
 						"layout": {
+							"h": 14,
 							"i": "top-reps",
-							"x": 0,
-							"y": 101,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 10,
+							"y": 86
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-emp-by-dept",
 						"layout": {
+							"h": 14,
 							"i": "emp-dept",
-							"x": 10,
-							"y": 101,
+							"moved": false,
 							"w": 10,
-							"h": 16
+							"x": 0,
+							"y": 100
 						}
 					},
 					{
 						"type": "chart",
 						"chart": "tc-opex-trend",
 						"layout": {
+							"h": 14,
 							"i": "opex-trend",
-							"x": 0,
-							"y": 117,
-							"w": 20,
-							"h": 16
+							"moved": false,
+							"w": 10,
+							"x": 10,
+							"y": 100
 						}
 					}
 				]
